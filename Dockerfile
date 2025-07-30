@@ -1,9 +1,10 @@
-# Билд фронтенда
+# Шаг сборки фронтенда
 FROM node:18 as frontend-builder
 WORKDIR /app
-COPY frontend/package.json .
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm ci --silent
 COPY frontend/ .
-RUN npm install && npm run build
+RUN npm run build
 
 # Основной образ
 FROM python:3.10-slim
@@ -17,8 +18,7 @@ COPY backend/ ./backend
 # Копируем собранный фронтенд
 COPY --from=frontend-builder /app/dist /app/frontend/dist
 
-# Статический файл сервер для фронтенда
-RUN pip install aiofiles
+# Копируем serve.py
 COPY serve.py .
 
 ENV PORT=8080
