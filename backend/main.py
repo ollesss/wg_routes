@@ -1,12 +1,11 @@
+import os
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 import re
-from pathlib import Path
-import os
 
 app = FastAPI()
 
+# Настройки CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -14,17 +13,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.post("/generate")
-async def generate_routes(
-    config: UploadFile = File(None),
-    gateway: str = Form("0.0.0.0"),
-    extra_ips: str = Form("")
-):
+def generate_routes(config_text: str, gateway: str, extra_ips: str):
     allowed_ips = []
     
-    if config:
-        content = await config.read()
-        matches = re.findall(r'AllowedIPs\s*=\s*(.+?)(?=\n|$)', content.decode(), re.IGNORECASE)
+    if config_text:
+        matches = re.findall(r'AllowedIPs\s*=\s*(.+?)(?=\n|$)', config_text, re.IGNORECASE)
         for match in matches:
             allowed_ips.extend([ip.strip() for ip in match.split(',') if ip.strip()])
     
@@ -40,8 +33,15 @@ async def generate_routes(
             netmask = f"{(mask >> 24) & 0xff}.{(mask >> 16) & 0xff}.{(mask >> 8) & 0xff}.{mask & 0xff}"
             bat_lines.append(f"route ADD {ip} MASK {netmask} {gateway}")
     
-    return {"bat_content": "\n".join(bat_lines)}
+    return "\n".join(bat_lines)
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", 8000)))
+@app.post("/api/generate")
+async def create_routes(
+    config: UploadFile = File(None),
+    gateway: str = Form("0.0.0.0"),
+    extra_ips: str = Form("")
+):
+    config_text = (await config.read()).decode() if config else ""
+    return {
+        "bat_content": generate_routes(config_text, gateway, extra_ips)
+    }
