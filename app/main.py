@@ -8,9 +8,17 @@ import os
 
 app = FastAPI()
 
+# Настройка шаблонов
+app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
+
 @app.get("/")
-async def root():
-    return {"message": "Hello World"}
+async def read_root(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
+
+@app.get("/health")
+async def health_check():
+    return {"status": "ok"}
 
 # Настройка шаблонов
 templates = Jinja2Templates(directory="templates")
@@ -66,11 +74,13 @@ async def generate(
         }
     )
 
+
 if __name__ == "__main__":
     uvicorn.run(
         "main:app",
         host="0.0.0.0",
         port=int(os.getenv("PORT", 8080)),
-        reload=False,
-        access_log=False
+        workers=int(os.getenv("UVICORN_WORKERS", 1)),
+        log_level="info",
+        reload=False
     )
