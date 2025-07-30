@@ -1,11 +1,10 @@
 from fastapi import FastAPI, Request, Form, UploadFile
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+import uvicorn
 import re
 from pathlib import Path
 import os
-import os
-from fastapi import FastAPI
 
 app = FastAPI()
 
@@ -68,10 +67,10 @@ async def generate(
     )
 
 if __name__ == "__main__":
-    import uvicorn
     uvicorn.run(
         app,
         host="0.0.0.0",
         port=int(os.getenv("PORT", 8080)),
-        reload=False
+        workers=int(os.getenv("UVICORN_WORKERS", 1)),
+        log_level="info"
     )
