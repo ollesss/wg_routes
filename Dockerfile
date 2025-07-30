@@ -1,16 +1,22 @@
-FROM python:3.10-slim
+FROM python:3.10-slim as builder
 
 WORKDIR /app
-
-# Устанавливаем зависимости
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --user -r requirements.txt
 
-# Копируем приложение
-COPY app ./app
+FROM python:3.10-slim
+WORKDIR /app
 
-# Явно указываем рабочую директорию для приложения
-WORKDIR /app/app
+# Копируем зависимости из builder
+COPY --from=builder /root/.local /root/.local
+COPY . .
 
-# Запускаем сервер
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080", "--no-access-log"]
+# Убедимся, что скрипты в PATH
+ENV PATH=/root/.local/bin:$PATH
+
+# Явно указываем переменные для Uvicorn
+ENV PORT=8080
+EXPOSE 8080
+
+# Команда запуска с таймаутом
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT} --no-access-log --timeout-keep-alive 30"]

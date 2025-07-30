@@ -4,8 +4,14 @@ from fastapi.templating import Jinja2Templates
 import re
 from pathlib import Path
 import os
+import os
+from fastapi import FastAPI
 
 app = FastAPI()
+
+@app.get("/health")
+async def health_check():
+    return {"status": "ok"}
 
 # Настройка шаблонов
 templates = Jinja2Templates(directory="templates")
