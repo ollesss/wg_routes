@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WireGuard Route Generator</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>WireGuard ➜ Keenetic Route .bat</h1>
+    <form method="post" action="/generate" enctype="multipart/form-data">
+        <label>Upload WireGuard config:</label>
+        <input type="file" name="file" required><br>
+        <label>Gateway:</label>
+        <input type="text" name="gateway" value="0.0.0.0"><br>
+        <label>Extra IPs (comma separated):</label>
+        <input type="text" name="extra_ips"><br>
+        <button type="submit">Generate .bat</button>
+    </form>
+</body>
+</html>
