@@ -3,6 +3,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import re
 from pathlib import Path
+import os
 
 app = FastAPI()
 
@@ -58,4 +59,13 @@ async def generate(
             "gateway": gateway,
             "extra_ips": extra_ips
         }
+    )
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(
+        app,
+        host="0.0.0.0",
+        port=int(os.getenv("PORT", 8080)),
+        reload=False
     )
