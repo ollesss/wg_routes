@@ -8,9 +8,9 @@ import os
 
 app = FastAPI()
 
-@app.get("/health")
-async def health_check():
-    return {"status": "ok"}
+@app.get("/")
+async def root():
+    return {"message": "Hello World"}
 
 # Настройка шаблонов
 templates = Jinja2Templates(directory="templates")
@@ -68,9 +68,9 @@ async def generate(
 
 if __name__ == "__main__":
     uvicorn.run(
-        app,
+        "main:app",
         host="0.0.0.0",
         port=int(os.getenv("PORT", 8080)),
-        workers=int(os.getenv("UVICORN_WORKERS", 1)),
-        log_level="info"
+        reload=False,
+        access_log=False
     )
