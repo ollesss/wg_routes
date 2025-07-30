@@ -13,5 +13,5 @@ COPY . .
 ENV PORT=8080
 EXPOSE 8080
 
-# Запускаем сервер (важно: через `sh -c` и с логами)
-CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1 --log-level info"]
+# Запускаем сервер (важно: через `python -m`!)
+CMD ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080", "--workers", "1"]
