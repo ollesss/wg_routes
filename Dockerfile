@@ -7,4 +7,7 @@ RUN pip install -r requirements.txt
 COPY backend ./backend
 COPY frontend ./frontend
 
-CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "80"]
+ENV PORT=8080
+EXPOSE 8080
+
+CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "${PORT}"]

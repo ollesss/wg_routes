@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import re
 from pathlib import Path
+import os
 
 app = FastAPI()
 
@@ -40,3 +41,7 @@ async def generate_routes(
             bat_lines.append(f"route ADD {ip} MASK {netmask} {gateway}")
     
     return {"bat_content": "\n".join(bat_lines)}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", 8000)))
